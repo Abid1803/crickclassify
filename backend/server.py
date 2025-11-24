@@ -48,57 +48,30 @@ def home():
     return jsonify({"message": "API Running"})
 
 
-# @app.route("/predict", methods=["POST"])
-# def predict():
-#     if "file" not in request.files:   # IMPORTANT FIX
-#         return jsonify({"error": "No file uploaded"}), 400
-
-#     file = request.files["file"]
-#     img_bytes = np.frombuffer(file.read(), np.uint8)
-#     img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
-
-#     processed = preprocess_image(img)
-
-#     if processed is None:
-#         return jsonify({"error": "Face not detected or multiple faces found"}), 400
-
-#     prediction = model.predict(processed)
-#     idx = int(np.argmax(prediction))
-#     confidence = float(prediction[0][idx])
-
-#     return jsonify({
-#         "predicted_class": index_to_class[idx],
-#         "confidence": confidence
-#     })
-
-
 @app.route("/predict", methods=["POST"])
 def predict():
-    if "image" not in request.files:
-        return jsonify({"error": "No image uploaded"}), 400
+    if "file" not in request.files:   # IMPORTANT FIX
+        return jsonify({"error": "No file uploaded"}), 400
 
-    file = request.files["image"]
-    img = cv2.imdecode(np.frombuffer(file.read(), np.uint8), cv2.IMREAD_COLOR)
+    file = request.files["file"]
+    img_bytes = np.frombuffer(file.read(), np.uint8)
+    img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
 
     processed = preprocess_image(img)
+
     if processed is None:
-        return jsonify({"error": "Face detection failed"}), 400
+        return jsonify({"error": "Face not detected or multiple faces found"}), 400
 
     prediction = model.predict(processed)
-
-    # DEBUG — print raw prediction
-    print("PRED VECTOR:", prediction[0])
-    print("ARGMAX INDEX:", np.argmax(prediction))
-
-    index = int(np.argmax(prediction))
-    label = index_to_class.get(index, "UNKNOWN")
-    confidence = float(prediction[0][index])
+    idx = int(np.argmax(prediction))
+    confidence = float(prediction[0][idx])
 
     return jsonify({
-        "predicted_class": label,
-        "confidence": confidence,
-        "index": index
+        "predicted_class": index_to_class[idx],
+        "confidence": confidence
     })
+
+
 
 
 if __name__ == "__main__":

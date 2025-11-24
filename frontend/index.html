@@ -1,124 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cricketer Classifier</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #111;
-            color: #eee;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px;
-        }
-        h1 {
-            color: #00e676;
-            margin-bottom: 20px;
-        }
-        .container {
-            width: 350px;
-            padding: 20px;
-            background: #222;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #000;
-            text-align: center;
-        }
-        input[type="file"] {
-            margin: 20px 0;
-        }
-        button {
-            padding: 10px 20px;
-            background: #00e676;
-            border: none;
-            color: #000;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background: #00c853;
-        }
-        #result {
-            margin-top: 20px;
-            background: #333;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        img#preview {
-            margin-top: 10px;
-            max-width: 100%;
-            border-radius: 10px;
-        }
-    </style>
 </head>
-<body>
+<body style="font-family: Arial; padding: 20px;">
+    <h2>Upload a Player Image</h2>
 
-    <h1>Cricketer Classifier 🏏</h1>
+    <input type="file" id="imageInput" accept="image/*"><br><br>
 
-    <div class="container">
-        <form id="uploadForm">
-            <input type="file" id="fileInput" name="image" accept="image/*" required><br>
-            <button type="submit">Predict</button>
-        </form>
+    <button onclick="predict()">Predict</button>
 
-        <img id="preview" style="display:none;"/>
-
-        <div id="result"></div>
-    </div>
+    <h3 id="result"></h3>
 
     <script>
-        // IMPORTANT: replace BACKEND_URL_HERE with your Render/Railway Flask URL
-        const serverUrl = "https://BACKEND_URL_HERE/predict";
-
-        document.getElementById("fileInput").addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const preview = document.getElementById("preview");
-                preview.src = URL.createObjectURL(file);
-                preview.style.display = "block";
+        async function predict() {
+            const fileInput = document.getElementById("imageInput");
+            if (fileInput.files.length === 0) {
+                alert("Select an image first.");
+                return;
             }
-        });
-
-        document.getElementById("uploadForm").addEventListener("submit", async function(event) {
-            event.preventDefault();
-            const file = document.getElementById("fileInput").files[0];
-            if (!file) return;
 
             const formData = new FormData();
-            formData.append("image", file);
+            formData.append("file", fileInput.files[0]);
 
-            const resultBox = document.getElementById("result");
-            resultBox.innerHTML = "Processing...";
+            document.getElementById("result").innerHTML = "Predicting...";
 
-            try {
-                const response = await fetch(serverUrl, {
-                    method: "POST",
-                    body: formData
-                });
+            const res = await fetch("https://crickclassify.onrender.com/predict", {
+                method: "POST",
+                body: formData
+            });
 
-                const text = await response.text();
-                console.log("RAW RESPONSE:", text);
+            const data = await res.json();
 
-                let data = JSON.parse(text);
-
-                if (data.error) {
-                    resultBox.innerHTML = `<span style='color:red;'>${data.error}</span>`;
-                } else {
-                    resultBox.innerHTML =
-                        `<strong>Predicted:</strong> ${data.predicted_class}<br>
-                         <strong>Confidence:</strong> ${data.confidence.toFixed(3)}`;
-                }
-
-            } catch (err) {
-                console.error(err);
-                resultBox.innerHTML = "<span style='color:red;'>Failed to reach server.</span>";
+            if (data.error) {
+                document.getElementById("result").innerHTML = "Error: " + data.error;
+            } else {
+                document.getElementById("result").innerHTML =
+                    "Player: " + data.prediction + "<br>Confidence: " + data.confidence.toFixed(2);
             }
-        });
+        }
     </script>
-
 </body>
 </html>

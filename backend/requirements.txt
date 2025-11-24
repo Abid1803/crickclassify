@@ -1,6 +1,7 @@
-flask
-flask-cors
-tensorflow
-mtcnn
-opencv-python-headless
-numpy
+Flask==3.0.3
+tensorflow==2.17.0
+opencv-python-headless==4.10.0.84
+mtcnn==0.1.1
+numpy==1.26.4
+pillow
+gunicorn==22.0.0

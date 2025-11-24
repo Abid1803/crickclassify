@@ -1,110 +1,84 @@
-CrickClassify 🏏 — Cricketer Identification Using Deep Learning
+# CrickClassify 🏏 — Indian Cricketer Identification Using Deep Learning
 
-Live Demo:
-👉 https://crickclassify.netlify.app/
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Visit_Now-blue?style=for-the-badge&logo=netlify)](https://crickclassify.netlify.app/)
 
-📌 Overview
+A lightweight, end-to-end deep learning web application that instantly recognizes popular **Indian cricketers** from any uploaded photo using face detection and a custom-trained CNN.
 
-CrickClassify is a lightweight deep-learning application that identifies Indian cricketers from an uploaded image.
-It combines face detection, image preprocessing, and a convolutional neural network to output the player name along with a confidence score.
+👉 **Live Demo**: https://crickclassify.netlify.app/
 
-The goal of this project is to demonstrate a simple yet functional end-to-end ML deployment pipeline — from dataset cleaning to model serving and frontend integration.
+## 📌 Overview
 
-🧠 Machine Learning Pipeline
-1️⃣ Dataset Preparation
+CrickClassify combines modern computer vision techniques to deliver fast and accurate cricketer identification directly in the browser-to-server pipeline:
 
-Training images were organized by player name
+- Face detection → Image preprocessing → CNN inference → Player name + confidence score
 
-Each image was cleaned using:
+Perfect for cricket fans, this project also serves as a clean, production-ready example of a full ML deployment pipeline — from raw data cleaning to live web serving.
 
-MTCNN → detects exactly one face
+## 🧠 Machine Learning Pipeline
 
-Blurriness filtering using Laplacian variance
+### 1️⃣ Dataset Preparation
+- Images organized by player name
+- Strict cleaning using:
+  - **MTCNN** – ensures exactly one face per image
+  - Blurriness filtering (Laplacian variance threshold)
+  - Automatic face cropping + resizing to **224×224**
 
-Automatic cropping and resizing to 224×224
+### 2️⃣ Model Architecture (Lightweight & Fast)
+Built on transfer learning with **MobileNetV2** (pretrained on ImageNet):
 
-2️⃣ Model Architecture
+```text
+MobileNetV2 (frozen base layers)
+├── GlobalAveragePooling2D
+├── Dense(256, activation='relu')
+├── Dropout(0.3)
+└── Dense(num_classes, activation='softmax')
+```
 
-A lightweight CNN built on MobileNetV2 (pretrained on ImageNet):
+### 3️⃣ Training Details
 
-MobileNetV2 (frozen base)
+| Hyperparameter      | Value                          |
+|---------------------|--------------------------------|
+| Optimizer           | Adam                           |
+| Loss                | Categorical Crossentropy       |
+| Epochs              | 15                             |
+| Batch Size          | 32                             |
+| Steps per Epoch     | 15 (balanced for dataset size) |
 
-GlobalAveragePooling
+### 4️⃣ Inference Workflow
 
-Dense(256, ReLU)
+1. User uploads an image  
+2. MTCNN detects and extracts the face  
+3. Face is cropped, resized, and normalized  
+4. TensorFlow Keras model predicts probabilities  
+5. Highest-confidence class + score displayed instantly  
 
-Dropout(0.3)
+### 🌐 Deployment Architecture
 
-Dense(num_classes, softmax)
+```text
+Frontend (Netlify)                Backend (Render)
+HTML + Vanilla JS   ←→   Flask API + TensorFlow
+Minimal JetBrains Mono theme         Loads .keras model
+Sends image as base64                MTCNN + OpenCV preprocessing
+                                     Returns JSON {predicted_class, confidence}
+```
+- **Frontend**: Static site hosted on Netlify (zero server management)
+- **Backend**: Flask API hosted on Render (free tier friendly)
 
-This architecture provides fast inference and small model size, ideal for web deployment.
+### 📁 Project Structure
 
-3️⃣ Training Info
-
-Optimizer: Adam
-
-Loss: Categorical Crossentropy
-
-Epochs: 15
-
-Batch size: 32
-
-Steps per epoch: 15 (adjusted for dataset size)
-
-4️⃣ Inference Workflow
-
-When a user uploads an image:
-
-MTCNN detects the face
-
-The face is cropped & normalized
-
-TensorFlow model returns a probability vector
-
-The highest-confidence class is chosen
-
-The result is shown in the UI
-
-🌐 Deployment Architecture
-Frontend — Netlify
-
-Pure HTML + JS interface
-
-Minimalistic JetBrains Mono theme
-
-Sends the uploaded image to backend API
-
-Backend — Render
-
-Flask API serves predictions
-
-TensorFlow loads the .keras model
-
-MTCNN + OpenCV perform preprocessing
-
-Returns JSON response with:
-
-predicted_class
-
-confidence
-
-📁 Project Structure
+```text
 crickclassify/
 │
 ├── backend/
-│   ├── server.py
-│   ├── cricknet_model.keras
-│   ├── class_dictionary.json
-│   ├── requirements.txt
+│   ├── server.py              # Flask API
+│   ├── cricknet_model.keras   # Trained model
+│   ├── class_dictionary.json  # Class name mapping
+│   └── requirements.txt       # Python dependencies
 │
 └── frontend/
-    └── index.html
+    └── index.html             # Single-page UI
+```
+### 👤 Author
 
-👤 Author
-
-Mohammad Abid (maxEpoch)
-Portfolio: https://maxepoch.netlify.app/
-
-🚀 Live Project Link
-
-👉 https://crickclassify.netlify.app/
+**Mohammad Abid** (@maxEpoch)  
+Portfolio: [https://maxepoch.netlify.app](https://maxepoch.netlify.app)

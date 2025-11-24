@@ -54,13 +54,6 @@ MobileNetV2 (frozen base layers)
 
 ### 🌐 Deployment Architecture
 
-```text
-Frontend (Netlify)                Backend (Render)
-HTML + Vanilla JS   ←→   Flask API + TensorFlow
-Minimal JetBrains Mono theme         Loads .keras model
-Sends image as base64                MTCNN + OpenCV preprocessing
-                                     Returns JSON {predicted_class, confidence}
-```
 - **Frontend**: Static site hosted on Netlify (zero server management)
 - **Backend**: Flask API hosted on Render (free tier friendly)
 

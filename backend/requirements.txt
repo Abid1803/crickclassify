@@ -1,6 +1,6 @@
-Flask
+flask
 flask-cors
-tensorflow==2.17.0
+tensorflow
 mtcnn
 opencv-python-headless
 numpy
